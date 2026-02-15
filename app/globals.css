@@ -2,15 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --font-courier: 'Courier Prime', monospace;
-  --font-playfair: 'Playfair Display', serif;
-}
-
 body {
-  font-family: var(--font-courier);
-}
-
-h1, h2, h3 {
-  font-family: var(--font-playfair);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
