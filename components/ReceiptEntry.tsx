@@ -7,14 +7,18 @@ interface ReceiptEntryProps {
 
 export default function ReceiptEntry({ entry, index }: ReceiptEntryProps) {
   return (
-    <div className="py-3 border-b border-dashed border-gray-300">
-      <div className="flex justify-between items-start font-mono text-sm">
-        <div className="flex-1">
-          <span className="text-gray-500 mr-3">#{String(index + 1).padStart(3, '0')}</span>
-          <span className="text-gray-900">{entry.text}</span>
+    <div className="py-2.5 border-b border-gray-200 hover:bg-gray-50/50 transition-colors duration-150">
+      <div className="font-mono text-sm leading-relaxed">
+        <div className="flex items-start gap-3">
+          <span className="text-gray-400 font-medium flex-shrink-0 text-xs mt-0.5">
+            {String(index + 1).padStart(3, '0')}.
+          </span>
+          <span className="text-gray-800 flex-1">
+            {entry.text}
+          </span>
         </div>
       </div>
-      <div className="text-xs text-gray-500 font-mono mt-1 text-right">
+      <div className="text-[10px] text-gray-400 font-mono mt-1.5 text-right tracking-wider">
         {entry.date}
       </div>
     </div>
