@@ -1,115 +1,106 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import { ReceiptState } from '@/lib/types';
 import { getReceiptState, addEntry, clearAllEntries } from '@/lib/storage';
-import AddEntryForm from '@/components/AddEntryForm';
-import ReceiptHeader from '@/components/ReceiptHeader';
-import ReceiptEntry from '@/components/ReceiptEntry';
-import ReceiptFooter from '@/components/ReceiptFooter';
 
 export default function Home() {
   const [state, setState] = useState<ReceiptState>({ entries: [] });
-  const bottomRef = useRef<HTMLDivElement>(null);
+  const [inputText, setInputText] = useState('');
 
   useEffect(() => {
     setState(getReceiptState());
   }, []);
 
-  const handleAddEntry = (text: string) => {
-    const newState = addEntry(text);
-    setState(newState);
-    
-    // Auto-scroll to bottom after adding
-    setTimeout(() => {
-      bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
-    }, 100);
+  const handleAdd = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (inputText.trim()) {
+      const newState = addEntry(inputText.trim());
+      setState(newState);
+      setInputText('');
+    }
   };
 
   const handleClearAll = () => {
-    if (confirm('Are you sure you want to clear all entries?')) {
-      const newState = clearAllEntries();
-      setState(newState);
+    if (confirm('Clear all entries?')) {
+      setState(clearAllEntries());
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-amber-100 via-orange-50 to-red-50 p-4 md:p-8">
-      <AddEntryForm onAdd={handleAddEntry} />
-
-      <div className="container mx-auto max-w-2xl">
-        {/* Receipt Paper Container with perforated edges */}
-        <div 
-          className="bg-gradient-to-b from-white to-gray-50 shadow-2xl min-h-screen relative"
-          style={{
-            backgroundImage: `
-              repeating-linear-gradient(
-                0deg,
-                transparent,
-                transparent 24px,
-                rgba(200,200,200,0.1) 24px,
-                rgba(200,200,200,0.1) 25px
-              )
-            `,
-          }}
-        >
-          {/* Perforated edges */}
-          <div className="absolute top-0 left-0 right-0 h-3 bg-white opacity-90" style={{
-            backgroundImage: 'radial-gradient(circle, transparent 40%, white 40%)',
-            backgroundSize: '16px 8px',
-            backgroundPosition: '0 -4px'
-          }}/>
-          
-          <div className="px-6 md:px-12 py-8 pt-10">
-            <ReceiptHeader />
-
-            {/* Entries List */}
-            <div className="py-6 space-y-3">
-              {state.entries.length === 0 ? (
-                <div className="text-center py-16 px-4">
-                  <p className="text-gray-400 font-mono text-sm mb-2">
-                    ═══════════════════════════
-                  </p>
-                  <p className="text-gray-500 text-sm italic mb-2">
-                    Your gratitude journal awaits
-                  </p>
-                  <p className="text-gray-400 font-mono text-sm">
-                    ═══════════════════════════
-                  </p>
-                </div>
-              ) : (
-                state.entries.map((entry, index) => (
-                  <ReceiptEntry key={entry.id} entry={entry} index={index} />
-                ))
-              )}
-            </div>
-
-            {state.entries.length > 0 && (
-              <ReceiptFooter totalEntries={state.entries.length} />
-            )}
-
-            {/* Clear All Button */}
-            {state.entries.length > 0 && (
-              <div className="text-center py-8 border-t border-gray-200 mt-6">
-                <button
-                  onClick={handleClearAll}
-                  className="text-xs text-gray-400 hover:text-red-500 font-mono transition-colors duration-200"
-                >
-                  [ clear all ]
-                </button>
-              </div>
-            )}
-
-            <div ref={bottomRef} className="h-8" />
-          </div>
-
-          {/* Bottom perforated edge */}
-          <div className="absolute bottom-0 left-0 right-0 h-3 bg-white opacity-90" style={{
-            backgroundImage: 'radial-gradient(circle, transparent 40%, white 40%)',
-            backgroundSize: '16px 8px',
-            backgroundPosition: '0 4px'
-          }}/>
+    <div className="min-h-screen bg-gradient-to-br from-rose-50 via-pink-50 to-orange-50">
+      <div className="max-w-2xl mx-auto px-4 py-12">
+        
+        {/* Header */}
+        <div className="text-center mb-8">
+          <div className="text-5xl mb-3">✨</div>
+          <h1 className="text-4xl font-bold text-gray-800 mb-2">
+            Daily Gratitude
+          </h1>
+          <p className="text-gray-500">What are you grateful for today?</p>
         </div>
+
+        {/* Input Form */}
+        <form onSubmit={handleAdd} className="mb-8">
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-4">
+            <input
+              type="text"
+              value={inputText}
+              onChange={(e) => setInputText(e.target.value)}
+              placeholder="I'm grateful for..."
+              className="w-full text-lg px-2 py-2 outline-none text-gray-800 placeholder:text-gray-400"
+              autoFocus
+            />
+            <button
+              type="submit"
+              className="mt-3 w-full bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white font-medium py-3 rounded-xl transition-all active:scale-95"
+            >
+              Add Entry
+            </button>
+          </div>
+        </form>
+
+        {/* Stats */}
+        {state.entries.length > 0 && (
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 mb-6 text-center">
+            <p className="text-sm text-gray-500 mb-1">Total Entries</p>
+            <p className="text-4xl font-bold text-pink-500">{state.entries.length}</p>
+          </div>
+        )}
+
+        {/* Entries List */}
+        {state.entries.length === 0 ? (
+          <div className="text-center py-16">
+            <div className="text-6xl mb-4">💭</div>
+            <p className="text-gray-400">No entries yet</p>
+            <p className="text-gray-400 text-sm">Start your gratitude journey above</p>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {state.entries.slice().reverse().map((entry) => (
+              <div
+                key={entry.id}
+                className="bg-white rounded-xl shadow-sm border border-gray-200 p-5 hover:shadow-md transition-shadow"
+              >
+                <p className="text-gray-800 text-lg mb-2">{entry.text}</p>
+                <p className="text-xs text-gray-400">{entry.date}</p>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Clear Button */}
+        {state.entries.length > 0 && (
+          <div className="text-center mt-8">
+            <button
+              onClick={handleClearAll}
+              className="text-sm text-gray-400 hover:text-red-500 transition-colors"
+            >
+              Clear all entries
+            </button>
+          </div>
+        )}
+
       </div>
     </div>
   );
